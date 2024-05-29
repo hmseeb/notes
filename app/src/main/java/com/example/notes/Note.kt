@@ -6,5 +6,6 @@ data class Note(
     val content: String,
     var isFavourite: Int,
     val location: String,
-    val date: String
+    val date: String,
+    val drawing: ByteArray? = null // Add this property
 )
