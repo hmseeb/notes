@@ -1,6 +1,10 @@
 package com.example.notes
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -9,62 +13,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class NotesAdapter(
-    private val notesList: List<Note>,
-    private val listener: OnItemClickListener
+    private val context: Context,
+    private var notesList: List<Note>,
+    private val dbHelper: NotesDatabaseHelper
 ) : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
 
-    inner class NoteViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        val noteTitle: TextView = view.findViewById(R.id.noteTitle)
-        val noteContent: TextView = view.findViewById(R.id.noteContent)
-        val noteLocation: TextView = view.findViewById(R.id.noteLocation)
-        val menuButton: ImageView = view.findViewById(R.id.menuButton)
-
-        init {
-            view.setOnClickListener(this)
-            menuButton.setOnClickListener {
-                showPopupMenu(it, adapterPosition)
-            }
-        }
-
-        override fun onClick(v: View?) {
-            val position = adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                listener.onItemClick(position)
-            }
-        }
-
-        private fun showPopupMenu(view: View, position: Int) {
-            val popupMenu = PopupMenu(view.context, view)
-            popupMenu.inflate(R.menu.note_menu)
-
-            val note = notesList[position]
-            if (note.isFavourite == 1) {
-                popupMenu.menu.findItem(R.id.action_favorite).title = "Remove from Favorites"
-            }
-
-            popupMenu.setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    R.id.action_favorite -> {
-                        listener.onFavoriteClick(position)
-                        true
-                    }
-                    R.id.action_edit -> {
-                        listener.onEditClick(position)
-                        true
-                    }
-                    R.id.action_delete -> {
-                        listener.onDeleteClick(position)
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popupMenu.show()
-        }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_note, parent, false)
         return NoteViewHolder(view)
     }
 
@@ -72,15 +27,67 @@ class NotesAdapter(
         val note = notesList[position]
         holder.noteTitle.text = note.title
         holder.noteContent.text = note.content
-        holder.noteLocation.text = note.location
+        holder.menuButton.setOnClickListener {
+            showPopupMenu(holder.menuButton, note)
+        }
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ViewNoteActivity::class.java)
+            intent.putExtra("NOTE_ID", note.id)
+            context.startActivity(intent)
+        }
     }
 
-    override fun getItemCount() = notesList.size
+    override fun getItemCount(): Int {
+        return notesList.size
+    }
 
-    interface OnItemClickListener {
-        fun onItemClick(position: Int)
-        fun onFavoriteClick(position: Int)
-        fun onEditClick(position: Int)
-        fun onDeleteClick(position: Int)
+    fun updateNotes(newNotes: List<Note>) {
+        notesList = newNotes
+        notifyDataSetChanged()
+    }
+
+    private fun showPopupMenu(view: View, note: Note) {
+        val popup = PopupMenu(context, view)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.note_menu, popup.menu)
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            when (menuItem.itemId) {
+                R.id.action_edit -> {
+                    val intent = Intent(context, AddNoteActivity::class.java)
+                    intent.putExtra("NOTE_ID", note.id)
+                    context.startActivity(intent)
+                    true
+                }
+                R.id.action_delete -> {
+                    dbHelper.deleteNote(note.id)
+                    updateNotes(dbHelper.getAllNotes())
+                    true
+                }
+                R.id.action_favorite -> {
+                    val isFavorite = if (note.isFavourite == 1) 0 else 1
+                    dbHelper.updateNote(
+                        Note(
+                            id = note.id,
+                            title = note.title,
+                            content = note.content,
+                            isFavourite = isFavorite,
+                            location = note.location,
+                            date = note.date,
+                            drawing = note.drawing
+                        )
+                    )
+                    updateNotes(dbHelper.getAllNotes())
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val noteTitle: TextView = itemView.findViewById(R.id.noteTitle)
+        val noteContent: TextView = itemView.findViewById(R.id.noteContent)
+        val menuButton: ImageView = itemView.findViewById(R.id.menuButton)
     }
 }

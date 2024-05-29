@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/darkBackground"
     tools:context=".ViewNoteActivity">
 
     <TextView
@@ -13,11 +14,12 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:textColor="@color/gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
-        tools:text="Date" />
+        tools:text="Thursday, May 30, 2024" />
 
     <TextView
         android:id="@+id/noteTitle"
@@ -25,6 +27,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="24sp"
+        android:textColor="@color/white"
         app:layout_constraintTop_toBottomOf="@id/noteDate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,13 +39,17 @@
     <TextView
         android:id="@+id/noteContent"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/noteTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/noteLocation"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         tools:text="Note Content" />
 
     <TextView
@@ -50,6 +57,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="12sp"
+        android:textColor="@color/gray"
         app:layout_constraintTop_toBottomOf="@id/noteContent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
