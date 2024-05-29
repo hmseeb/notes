@@ -13,4 +13,17 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
 
+    <!-- Custom SearchView style -->
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@drawable/search_view_background</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorHint">#BDBDBD</item>
+        <item name="android:iconifiedByDefault">false</item>
+    </style>
+
+    <!-- Custom SearchView text style -->
+    <style name="CustomSearchViewText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
 </resources>

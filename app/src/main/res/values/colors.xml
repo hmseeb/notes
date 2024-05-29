@@ -7,5 +7,5 @@
     <color name="white">#FFFFFF</color>
     <color name="hintColor">#757575</color>
     <color name="gray">#757575</color> <!-- Added color -->
-    <color name="black">#000000</color> <!-- Added color -->
+    <color name="black">#000000</color>
 </resources>

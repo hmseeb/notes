@@ -11,10 +11,11 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 
 class NotesAdapter(
     private val context: Context,
-    private var notesList: List<Note>,
+    private var notesList: MutableList<Note>,
     private val dbHelper: NotesDatabaseHelper
 ) : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
 
@@ -35,6 +36,34 @@ class NotesAdapter(
             intent.putExtra("NOTE_ID", note.id)
             context.startActivity(intent)
         }
+
+        // Set corner radius for first and last item
+        val cardView = holder.itemView.findViewById<MaterialCardView>(R.id.noteCard)
+        when (position) {
+            0 -> cardView.setCardBackgroundColor(context.resources.getColor(R.color.cardBackground))
+            itemCount - 1 -> cardView.setCardBackgroundColor(context.resources.getColor(R.color.cardBackground))
+            else -> cardView.setCardBackgroundColor(context.resources.getColor(R.color.cardBackground))
+        }
+
+        val radius = context.resources.getDimension(R.dimen.card_corner_radius)
+        if (position == 0) {
+            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
+                .toBuilder()
+                .setTopLeftCornerSize(radius)
+                .setTopRightCornerSize(radius)
+                .build()
+        } else if (position == itemCount - 1) {
+            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
+                .toBuilder()
+                .setBottomLeftCornerSize(radius)
+                .setBottomRightCornerSize(radius)
+                .build()
+        } else {
+            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
+                .toBuilder()
+                .setAllCornerSizes(0f)
+                .build()
+        }
     }
 
     override fun getItemCount(): Int {
@@ -42,7 +71,7 @@ class NotesAdapter(
     }
 
     fun updateNotes(newNotes: List<Note>) {
-        notesList = newNotes
+        notesList = newNotes.toMutableList()
         notifyDataSetChanged()
     }
 
