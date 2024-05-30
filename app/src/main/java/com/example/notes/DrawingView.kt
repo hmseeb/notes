@@ -1,36 +1,29 @@
 package com.example.notes
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 
-class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) {
-    private var drawPath: Path? = null
-    private var canvasPaint: Paint? = null
-    private var drawPaint: Paint? = null
-    private var drawCanvas: Canvas? = null
+class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+    private var path = Path()
+    private var paint = Paint()
     private var canvasBitmap: Bitmap? = null
+    private var drawCanvas: Canvas? = null
+    private var canvasPaint: Paint = Paint(Paint.DITHER_FLAG)
 
     init {
         setupDrawing()
     }
 
     private fun setupDrawing() {
-        drawPath = Path()
-        drawPaint = Paint()
-        drawPaint!!.color = Color.WHITE
-        drawPaint!!.isAntiAlias = true
-        drawPaint!!.strokeWidth = 5f
-        drawPaint!!.style = Paint.Style.STROKE
-        drawPaint!!.strokeJoin = Paint.Join.ROUND
-        drawPaint!!.strokeCap = Paint.Cap.ROUND
-        canvasPaint = Paint(Paint.DITHER_FLAG)
+        paint.color = Color.WHITE
+        paint.isAntiAlias = true
+        paint.strokeWidth = 5f
+        paint.style = Paint.Style.STROKE
+        paint.strokeJoin = Paint.Join.ROUND
+        paint.strokeCap = Paint.Cap.ROUND
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -42,32 +35,27 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(canvasBitmap!!, 0f, 0f, canvasPaint)
-        canvas.drawPath(drawPath!!, drawPaint!!)
+        canvas.drawPath(path, paint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val touchX = event.x
         val touchY = event.y
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> drawPath!!.moveTo(touchX, touchY)
-            MotionEvent.ACTION_MOVE -> drawPath!!.lineTo(touchX, touchY)
-            MotionEvent.ACTION_UP -> {
-                drawCanvas!!.drawPath(drawPath!!, drawPaint!!)
-                drawPath!!.reset()
-            }
-            else -> return false
+            MotionEvent.ACTION_DOWN -> path.moveTo(touchX, touchY)
+            MotionEvent.ACTION_MOVE -> path.lineTo(touchX, touchY)
+            MotionEvent.ACTION_UP -> drawCanvas?.drawPath(path, paint)
         }
         invalidate()
         return true
     }
 
-    fun getBitmap(): Bitmap {
-        return canvasBitmap!!
+    fun clearDrawing() {
+        path.reset()
+        invalidate()
     }
 
-    fun setBitmap(bitmap: Bitmap) {
-        canvasBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-        drawCanvas = Canvas(canvasBitmap!!)
-        invalidate()
+    fun getDrawing(): Bitmap? {
+        return canvasBitmap
     }
 }
