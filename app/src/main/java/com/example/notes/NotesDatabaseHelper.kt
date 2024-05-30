@@ -84,7 +84,6 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db.close()
         return notesList
     }
-
     fun updateNote(note: Note) {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -108,11 +107,19 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db.delete(TABLE_NAME, whereClause, whereArgs)
         db.close()
     }
-    fun getNoteById(noteId: Int): Note {
+    fun getNoteByID(noteId: Int): Note {
         val db = readableDatabase
-        val query = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID=?"
-        val cursor = db.rawQuery(query, arrayOf(noteId.toString()))
-        cursor.moveToFirst()
+        val cursor = db.query(
+            TABLE_NAME,
+            null,
+            "$COLUMN_ID = ?",
+            arrayOf(noteId.toString()),
+            null,
+            null,
+            null
+        )
+
+        cursor?.moveToFirst()
         val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
         val title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE))
         val content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT))
@@ -123,6 +130,7 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
         cursor.close()
         db.close()
+
         return Note(
             id = id,
             title = title,
@@ -133,5 +141,4 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             drawing = drawing
         )
     }
-
 }

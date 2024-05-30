@@ -4,8 +4,8 @@ data class Note(
     val id: Int,
     val title: String,
     val content: String,
-    var isFavourite: Int,
+    val isFavourite: Int,
     val location: String,
     val date: String,
-    val drawing: ByteArray? = null // Add this property
+    val drawing: ByteArray?
 )

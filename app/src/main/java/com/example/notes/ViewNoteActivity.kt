@@ -30,7 +30,7 @@ class ViewNoteActivity : AppCompatActivity() {
 
         val noteId = intent.getIntExtra("NOTE_ID", -1)
         if (noteId != -1) {
-            val note = dbHelper.getNoteById(noteId)
+            val note = dbHelper.getNoteByID(noteId)
             noteTitle.text = note.title
             noteContent.text = note.content
             noteLocation.text = note.location

@@ -47,7 +47,7 @@ class AddNoteActivity : AppCompatActivity() {
 
         noteId = intent.getIntExtra("NOTE_ID", -1)
         if (noteId != -1) {
-            val note = dbHelper.getNoteById(noteId)
+            val note = dbHelper.getNoteByID(noteId)
             noteTitle.setText(note.title)
             noteContent.setText(note.content)
             if (note.drawing != null) {
