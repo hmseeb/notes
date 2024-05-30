@@ -12,6 +12,7 @@ class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs)
     private var canvasBitmap: Bitmap? = null
     private var drawCanvas: Canvas? = null
     private var canvasPaint: Paint = Paint(Paint.DITHER_FLAG)
+    var isEditable: Boolean = true
 
     init {
         setupDrawing()
@@ -39,6 +40,9 @@ class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isEditable) {
+            return false
+        }
         val touchX = event.x
         val touchY = event.y
         when (event.action) {
@@ -57,5 +61,11 @@ class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
     fun getDrawing(): Bitmap? {
         return canvasBitmap
+    }
+
+    fun loadDrawing(bitmap: Bitmap) {
+        canvasBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        drawCanvas = Canvas(canvasBitmap!!)
+        invalidate()
     }
 }

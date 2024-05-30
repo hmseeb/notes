@@ -9,7 +9,7 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         private const val DATABASE_NAME = "notesapp.db"
-        private const val DATABASE_VERSION = 2 // Increment the version
+        private const val DATABASE_VERSION = 2
         private const val TABLE_NAME = "allnotes"
         private const val COLUMN_ID = "id"
         private const val COLUMN_TITLE = "title"
@@ -84,6 +84,7 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db.close()
         return notesList
     }
+
     fun updateNote(note: Note) {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -107,6 +108,7 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db.delete(TABLE_NAME, whereClause, whereArgs)
         db.close()
     }
+
     fun getNoteByID(noteId: Int): Note {
         val db = readableDatabase
         val cursor = db.query(
