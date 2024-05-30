@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 
@@ -37,14 +38,33 @@ class NotesAdapter(
             context.startActivity(intent)
         }
 
-        // Set corner radius for first and last item
-        val cardView = holder.itemView.findViewById<MaterialCardView>(R.id.noteCard)
-        when (position) {
-            0 -> cardView.setCardBackgroundColor(context.resources.getColor(R.color.cardBackground))
-            itemCount - 1 -> cardView.setCardBackgroundColor(context.resources.getColor(R.color.cardBackground))
-            else -> cardView.setCardBackgroundColor(context.resources.getColor(R.color.cardBackground))
+        // Set favorite icon
+        if (note.isFavourite == 1) {
+            holder.favoriteButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite))
+            holder.favoriteButton.setColorFilter(ContextCompat.getColor(context, R.color.red))
+        } else {
+            holder.favoriteButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite_border))
+            holder.favoriteButton.setColorFilter(ContextCompat.getColor(context, R.color.white))
         }
 
+        holder.favoriteButton.setOnClickListener {
+            val isFavorite = if (note.isFavourite == 1) 0 else 1
+            dbHelper.updateNote(
+                Note(
+                    id = note.id,
+                    title = note.title,
+                    content = note.content,
+                    isFavourite = isFavorite,
+                    location = note.location,
+                    date = note.date,
+                    drawing = note.drawing
+                )
+            )
+            updateNotes(dbHelper.getAllNotes())
+        }
+
+        // Set corner radius for first and last item
+        val cardView = holder.noteCard
         val radius = context.resources.getDimension(R.dimen.card_corner_radius)
         if (position == 0) {
             cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
@@ -92,22 +112,6 @@ class NotesAdapter(
                     updateNotes(dbHelper.getAllNotes())
                     true
                 }
-                R.id.action_favorite -> {
-                    val isFavorite = if (note.isFavourite == 1) 0 else 1
-                    dbHelper.updateNote(
-                        Note(
-                            id = note.id,
-                            title = note.title,
-                            content = note.content,
-                            isFavourite = isFavorite,
-                            location = note.location,
-                            date = note.date,
-                            drawing = note.drawing
-                        )
-                    )
-                    updateNotes(dbHelper.getAllNotes())
-                    true
-                }
                 else -> false
             }
         }
@@ -118,5 +122,7 @@ class NotesAdapter(
         val noteTitle: TextView = itemView.findViewById(R.id.noteTitle)
         val noteContent: TextView = itemView.findViewById(R.id.noteContent)
         val menuButton: ImageView = itemView.findViewById(R.id.menuButton)
+        val favoriteButton: ImageView = itemView.findViewById(R.id.favoriteButton)
+        val noteCard: MaterialCardView = itemView.findViewById(R.id.noteCard)
     }
 }
