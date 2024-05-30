@@ -103,7 +103,7 @@ class NotesAdapter(
             when (menuItem.itemId) {
                 R.id.action_edit -> {
                     val intent = Intent(context, AddNoteActivity::class.java)
-                    intent.putExtra("NOTE_ID", note.id)
+                    intent.putExtra("NOTE_ID", note.id) // Pass the note ID for editing
                     context.startActivity(intent)
                     true
                 }

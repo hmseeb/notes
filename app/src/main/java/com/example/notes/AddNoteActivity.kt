@@ -1,6 +1,7 @@
 package com.example.notes
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -29,6 +30,8 @@ class AddNoteActivity : AppCompatActivity(), LocationListener {
     private lateinit var locationManager: LocationManager
     private var currentLocation: String = ""
     private var currentDate: String = ""
+    private var isEditing = false
+    private var noteId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,12 +44,30 @@ class AddNoteActivity : AppCompatActivity(), LocationListener {
         dbHelper = NotesDatabaseHelper(this)
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
+        noteId = intent.getIntExtra("NOTE_ID", -1)
+        if (noteId != -1) {
+            isEditing = true
+            loadNoteDetails(noteId)
+        } else {
+            checkLocationPermission()
+            currentDate = getCurrentDate()
+        }
+
         saveButton.setOnClickListener {
             saveNote()
         }
+    }
 
-        checkLocationPermission()
-        currentDate = getCurrentDate()
+    private fun loadNoteDetails(noteId: Int) {
+        val note = dbHelper.getNoteByID(noteId)
+        noteTitle.setText(note.title)
+        noteContent.setText(note.content)
+        note.drawing?.let {
+            val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+            drawingView.loadDrawing(bitmap)
+        }
+        currentLocation = note.location
+        currentDate = note.date
     }
 
     private fun saveNote() {
@@ -62,7 +83,7 @@ class AddNoteActivity : AppCompatActivity(), LocationListener {
         val drawingBytes = drawing?.toByteArray()
         Log.d("AddNoteActivity", "Location to save: $currentLocation") // Add logging for location
         val note = Note(
-            id = 0,
+            id = if (isEditing) noteId else 0,
             title = title,
             content = content,
             isFavourite = 0,
@@ -71,8 +92,13 @@ class AddNoteActivity : AppCompatActivity(), LocationListener {
             drawing = drawingBytes
         )
 
-        dbHelper.insertNote(note)
-        Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show()
+        if (isEditing) {
+            dbHelper.updateNote(note)
+            Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show()
+        } else {
+            dbHelper.insertNote(note)
+            Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show()
+        }
         finish()
     }
 
