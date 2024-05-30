@@ -24,7 +24,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     private fun setupDrawing() {
         drawPath = Path()
         drawPaint = Paint()
-        drawPaint!!.color = Color.BLACK
+        drawPaint!!.color = Color.WHITE
         drawPaint!!.isAntiAlias = true
         drawPaint!!.strokeWidth = 5f
         drawPaint!!.style = Paint.Style.STROKE
