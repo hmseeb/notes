@@ -37,6 +37,7 @@ class ViewNoteActivity : AppCompatActivity() {
                 val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
                 drawingView.loadDrawing(bitmap)
             }
+            drawingView.setDrawingEnabled(false) // Ensure drawing is disabled in view mode
         }
     }
 }

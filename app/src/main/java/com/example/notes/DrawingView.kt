@@ -12,7 +12,7 @@ class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs)
     private var canvasBitmap: Bitmap? = null
     private var drawCanvas: Canvas? = null
     private var canvasPaint: Paint = Paint(Paint.DITHER_FLAG)
-    var isEditable: Boolean = true
+    private var isDrawingEnabled = false
 
     init {
         setupDrawing()
@@ -29,20 +29,25 @@ class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        drawCanvas = Canvas(canvasBitmap!!)
+        if (canvasBitmap == null) {
+            canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            drawCanvas = Canvas(canvasBitmap!!)
+        } else {
+            drawCanvas = Canvas(canvasBitmap!!)
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawBitmap(canvasBitmap!!, 0f, 0f, canvasPaint)
-        canvas.drawPath(path, paint)
+        if (canvasBitmap != null) {
+            canvas.drawBitmap(canvasBitmap!!, 0f, 0f, canvasPaint)
+            canvas.drawPath(path, paint)
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!isEditable) {
-            return false
-        }
+        if (!isDrawingEnabled) return false
+
         val touchX = event.x
         val touchY = event.y
         when (event.action) {
@@ -61,6 +66,10 @@ class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
     fun getDrawing(): Bitmap? {
         return canvasBitmap
+    }
+
+    fun setDrawingEnabled(enabled: Boolean) {
+        isDrawingEnabled = enabled
     }
 
     fun loadDrawing(bitmap: Bitmap) {
