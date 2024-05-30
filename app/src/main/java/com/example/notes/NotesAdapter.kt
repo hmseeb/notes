@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 
@@ -38,15 +37,43 @@ class NotesAdapter(
             context.startActivity(intent)
         }
 
-        // Set favorite icon
-        if (note.isFavourite == 1) {
-            holder.favoriteButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite))
-            holder.favoriteButton.setColorFilter(ContextCompat.getColor(context, R.color.red))
+        // Set corner radius for first and last item
+        val cardView = holder.itemView.findViewById<MaterialCardView>(R.id.noteCard)
+        val radius = context.resources.getDimension(R.dimen.card_corner_radius)
+
+        if (position == 0) {
+            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
+                .toBuilder()
+                .setTopLeftCornerSize(radius)
+                .setTopRightCornerSize(radius)
+                .setBottomLeftCornerSize(0f)
+                .setBottomRightCornerSize(0f)
+                .build()
+        } else if (position == itemCount - 1) {
+            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
+                .toBuilder()
+                .setTopLeftCornerSize(0f)
+                .setTopRightCornerSize(0f)
+                .setBottomLeftCornerSize(radius)
+                .setBottomRightCornerSize(radius)
+                .build()
         } else {
-            holder.favoriteButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite_border))
-            holder.favoriteButton.setColorFilter(ContextCompat.getColor(context, R.color.white))
+            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
+                .toBuilder()
+                .setAllCornerSizes(0f)
+                .build()
         }
 
+        // Hide the separator for the last item
+        if (position == notesList.size - 1) {
+            holder.separator.visibility = View.GONE
+        } else {
+            holder.separator.visibility = View.VISIBLE
+        }
+
+        // Set favorite icon
+        val favoriteIcon = if (note.isFavourite == 1) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
+        holder.favoriteButton.setImageResource(favoriteIcon)
         holder.favoriteButton.setOnClickListener {
             val isFavorite = if (note.isFavourite == 1) 0 else 1
             dbHelper.updateNote(
@@ -61,28 +88,6 @@ class NotesAdapter(
                 )
             )
             updateNotes(dbHelper.getAllNotes())
-        }
-
-        // Set corner radius for first and last item
-        val cardView = holder.noteCard
-        val radius = context.resources.getDimension(R.dimen.card_corner_radius)
-        if (position == 0) {
-            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
-                .toBuilder()
-                .setTopLeftCornerSize(radius)
-                .setTopRightCornerSize(radius)
-                .build()
-        } else if (position == itemCount - 1) {
-            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
-                .toBuilder()
-                .setBottomLeftCornerSize(radius)
-                .setBottomRightCornerSize(radius)
-                .build()
-        } else {
-            cardView.shapeAppearanceModel = cardView.shapeAppearanceModel
-                .toBuilder()
-                .setAllCornerSizes(0f)
-                .build()
         }
     }
 
@@ -103,7 +108,7 @@ class NotesAdapter(
             when (menuItem.itemId) {
                 R.id.action_edit -> {
                     val intent = Intent(context, AddNoteActivity::class.java)
-                    intent.putExtra("NOTE_ID", note.id) // Pass the note ID for editing
+                    intent.putExtra("NOTE_ID", note.id)
                     context.startActivity(intent)
                     true
                 }
@@ -123,6 +128,6 @@ class NotesAdapter(
         val noteContent: TextView = itemView.findViewById(R.id.noteContent)
         val menuButton: ImageView = itemView.findViewById(R.id.menuButton)
         val favoriteButton: ImageView = itemView.findViewById(R.id.favoriteButton)
-        val noteCard: MaterialCardView = itemView.findViewById(R.id.noteCard)
+        val separator: View = itemView.findViewById(R.id.separator) // Added separator reference
     }
 }
