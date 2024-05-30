@@ -27,13 +27,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private lateinit var mainLayout: View
     private lateinit var titleAllNotes: TextView
+    private lateinit var buttonFavoriteNotes: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainLayout = findViewById(R.id.mainLayout)
+        mainLayout = findViewById(R.id.mainLayout) // Correct reference
         titleAllNotes = findViewById(R.id.titleAllNotes)
+        buttonFavoriteNotes = findViewById(R.id.buttonFavoriteNotes)
         recyclerView = findViewById(R.id.recyclerView)
         fab = findViewById(R.id.fab)
         searchView = findViewById(R.id.searchView)
@@ -46,6 +48,11 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnClickListener {
             val intent = Intent(this, AddNoteActivity::class.java)
+            startActivity(intent)
+        }
+
+        buttonFavoriteNotes.setOnClickListener {
+            val intent = Intent(this, FavoriteNotesActivity::class.java)
             startActivity(intent)
         }
 

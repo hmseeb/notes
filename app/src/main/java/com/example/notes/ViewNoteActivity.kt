@@ -36,7 +36,6 @@ class ViewNoteActivity : AppCompatActivity() {
             note.drawing?.let {
                 val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
                 drawingView.loadDrawing(bitmap)
-                drawingView.isEnabled = false // Ensure DrawingView is non-editable
             }
         }
     }

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME = "notesapp.db"
+        private const val DATABASE_NAME = "notes.db"
         private const val DATABASE_VERSION = 2
         private const val TABLE_NAME = "allnotes"
         private const val COLUMN_ID = "id"
@@ -40,7 +40,35 @@ class NotesDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_DRAWING BLOB")
         }
     }
+    fun getFavoriteNotes(): List<Note> {
+        val notesList = mutableListOf<Note>()
+        val db = readableDatabase
+        val query = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_ISFAVOURITE = 1"
+        val cursor = db.rawQuery(query, null)
+        while (cursor.moveToNext()) {
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
+            val title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE))
+            val content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT))
+            val isFavourite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ISFAVOURITE))
+            val location = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION))
+            val date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE))
+            val drawing = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_DRAWING))
 
+            val note = Note(
+                id = id,
+                title = title,
+                content = content,
+                isFavourite = isFavourite,
+                location = location,
+                date = date,
+                drawing = drawing
+            )
+            notesList.add(note)
+        }
+        cursor.close()
+        db.close()
+        return notesList
+    }
     fun insertNote(note: Note) {
         val db = writableDatabase
         val values = ContentValues().apply {
