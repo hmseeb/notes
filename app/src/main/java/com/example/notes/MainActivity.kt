@@ -49,6 +49,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Set FAB icon color to white
+        val fabDrawable = DrawableCompat.wrap(fab.drawable)
+        DrawableCompat.setTint(fabDrawable, Color.WHITE)
+        fab.setImageDrawable(fabDrawable)
+
         // Set SearchView text color and hint color
         val searchText: EditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text)
         searchText.setTextColor(Color.WHITE)
@@ -58,12 +63,12 @@ class MainActivity : AppCompatActivity() {
         setSearchViewIconColor(searchView, Color.WHITE)
 
         // Dismiss keyboard on touch outside
-        mainLayout.setOnTouchListener { _, event ->
+        mainLayout.setOnTouchListener(fun(_: View, event: MotionEvent): Boolean {
             if (event.action == MotionEvent.ACTION_DOWN) {
                 hideKeyboard()
             }
-            false
-        }
+            return false
+        })
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
